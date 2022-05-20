@@ -154,6 +154,7 @@ public class LexicalAnalyser {
             } while (Character.isDigit(character));
             if (floatRange == 0) {
                 HandleError(sb.toString());
+                return GetToken();
             }
             name = "FLOAT_CONST";
         }

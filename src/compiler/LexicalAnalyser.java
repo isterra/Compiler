@@ -14,12 +14,14 @@ public class LexicalAnalyser {
     String s = currentRelativePath.toAbsolutePath().toString();
     private final ReadFile readFile;
     private int Line = 1;
+    private SymbleTable symbleTable;
 
     public LexicalAnalyser() throws FileNotFoundException {
-        this.readFile = new ReadFile(s+"\\src\\Codes\\test2.txt");
+        this.readFile = new ReadFile(s + "\\src\\Codes\\test3.txt");
+        symbleTable = new SymbleTable();
     }
 
-    public TOKEN Scan() throws IOException {
+    public TOKEN GetToken() throws IOException {
         TOKEN token = null;
         for (;; Readch()) {
             if (character == ' ' || character == '\t' || character == '\r' || character == '\b') {
@@ -27,35 +29,42 @@ public class LexicalAnalyser {
             } else if (character == '\n') {
                 Line++; //conta linhas
             } else if (character == '%') {
-                while(Readch()){
+                while (Readch()) {
                     if (character == '\n') {
                         Line++; //conta linhas
                     }
-                    if(character == '%'){
+                    if (character == '%') {
                         break;
                     }
+                }
+                if (character != '%') {
+                    HandleComentError("Miss '%'");
+                    break;
                 }
             } else {
                 break;
             }
         }
-        
+
         token = Operators(character);
-        if(token!=null){
+        if (token != null) {
+            if (token.getName() == "GT" || token.getName() == "LT") {
+                return token;
+            }
             Readch();
             return token;
         }
         //Const numbers
         if (Character.isDigit(character)) {
             token = ScanNumber();
-            if(token!=null){
+            if (token != null) {
                 return token;
             }
         }
         //Identifiers
         if (Character.isLetter(character)) {
             token = ScanIdentifier();
-             if(token!=null){
+            if (token != null) {
                 return token;
             }
         }
@@ -70,21 +79,22 @@ public class LexicalAnalyser {
                     }
                 }
             }
-             if(token!=null){
+            if (token != null) {
                 return token;
             }
         }
         if (character == '\"') {
-           token = ScanLiteral();
-            if(token!=null){
+            token = ScanLiteral();
+            if (token != null) {
                 return token;
             }
         }
-        if(CharIsASCII(character,false)){
-            token=new TOKEN("INVALID",Character.toString(character));
+        if (CharIsASCII(character, false)) {
+            HandleError(Character.toString(character));
             Readch();
+            return GetToken();
         }
-         return token;
+        return token;
     }
 
     private boolean Readch() throws IOException {
@@ -99,13 +109,21 @@ public class LexicalAnalyser {
             sb.append(character);
             Readch();
         } while (Character.isLetterOrDigit(character));
-        
+
         String s = sb.toString();
-        TOKEN token = new TOKEN("ID", s);
+        String reservedSymbol = symbleTable.IsReservedSymbol(s);
+        if (reservedSymbol != null) {
+            TOKEN token = new TOKEN(reservedSymbol);
+            return token;
+        }
+        String entryTable = symbleTable.SetToken(s);
+        TOKEN token = new TOKEN("ID", entryTable);
         return token;
 
     }
-
+    public void printSymbleTable(){
+        symbleTable.PrintHT();
+    }
     private TOKEN ScanLiteral() throws IOException {
         StringBuffer sb = new StringBuffer();
         for (Readch(); CharIsASCII(character, true); Readch()) {
@@ -128,10 +146,15 @@ public class LexicalAnalyser {
             Readch();
         } while (Character.isDigit(character));
         if (character == '.') {
+            int floatRange = -1;
             do {
                 sb.append(character);
+                floatRange++;
                 Readch();
             } while (Character.isDigit(character));
+            if (floatRange == 0) {
+                HandleError(sb.toString());
+            }
             name = "FLOAT_CONST";
         }
         String s = sb.toString();
@@ -139,7 +162,8 @@ public class LexicalAnalyser {
         return token;
 
     }
-    private TOKEN Operators(char ch) throws IOException{
+
+    private TOKEN Operators(char ch) throws IOException {
         TOKEN token = null;
         switch (ch) {
             case ';':
@@ -210,6 +234,7 @@ public class LexicalAnalyser {
         };
         return token;
     }
+
     private static boolean CharIsASCII(char character, boolean condition) {
         if (condition) {
             if (character > 0x00 && character < 0xff) {
@@ -220,5 +245,22 @@ public class LexicalAnalyser {
             }
         }
         return character > 0x00 && character < 0xff;
+    }
+
+    private void HandleError(String value) throws IOException {
+        String ANSI_RED = "\u001B[31m";
+        String ANSI_RESET = "\u001B[0m";
+        System.out.println(ANSI_RED + "Erro na linha: " + Line + " " + value + ANSI_RESET);
+        for (Readch();; Readch()) {
+            if (character == ' ' || character == '\t' || character == '\r' || character == '\b' || character == '\n') {
+                break;
+            }
+        }
+    }
+
+    private void HandleComentError(String value) throws IOException {
+        String ANSI_RED = "\u001B[31m";
+        String ANSI_RESET = "\u001B[0m";
+        System.out.println(ANSI_RED + "Erro na linha: " + Line + " " + value + ANSI_RESET);
     }
 }

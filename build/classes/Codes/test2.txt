@@ -1,12 +1,26 @@
 routine
- int a, b, c;
- float d, _var
+declare
+ int pontuacao, pontuacaoMaxina, disponibilidade;
+ char pontuacaoMinima;
 begin
- read (a);
- b := a * a;
- c := b + a/2 * (35/b); %aplica formula
- write c;
- val := 34.2
- c = val + 2. + a;
- write (val)
+ pontuacaoMinima = 50;
+ pontuacaoMaxima = 100;
+ write("Pontuacao do candidato: );
+ read(pontuacao);
+ write("Disponibilidade do candidato: ");
+ read(disponibilidade);
+%
+Processamento
+%
+ while (pontuacao>0 and (pontuacao<=pontuacaoMaxima) do
+ if ((pontuação > pontuacaoMinima) and (disponibilidade=1)) then
+ write("Candidato aprovado.")
+ else
+ write("Candidato reprovado.")
+ end
+ write("Pontuacao do candidato: ");
+ read(pontuacao);
+ write("Disponibilidade do candidato: ");
+ read(disponibilidade);
+ end;
 end

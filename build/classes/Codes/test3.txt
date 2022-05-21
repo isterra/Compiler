@@ -6,7 +6,7 @@ begin
  b := a * a;
  c := b + a/2 * (35/b); %aplica formula%
  write c;
- val := 34.2
+ val := 34.2c
  c = val + 2.5 + a;
  write (val)
 end

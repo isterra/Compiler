@@ -5,7 +5,7 @@ declare
 begin
  pontuacaoMinima = 50;
  pontuacaoMaxima = 100;
- write("Pontuacao do candidato: );
+ write("Pontuacao do candidato: ");
  read(pontuacao);
  write("Disponibilidade do candidato: ");
  read(disponibilidade);

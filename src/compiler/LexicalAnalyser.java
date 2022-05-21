@@ -5,40 +5,50 @@ import java.io.IOException;
 import compiler.Models.TOKEN;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 
 public class LexicalAnalyser {
 
     private final int EOF = -1;
     private char character = ' ';
     Path currentRelativePath = Paths.get("");
-    String s = currentRelativePath.toAbsolutePath().toString();
+    String absolutePath = currentRelativePath.toAbsolutePath().toString();
     private final ReadFile readFile;
     private int Line = 1;
-    private SymbleTable symbleTable;
+    private final SymbleTable symbleTable;
+    private final ArrayList<String> errors;
+    private int errorsCount;
 
     public LexicalAnalyser() throws FileNotFoundException {
-        this.readFile = new ReadFile(s + "\\src\\Codes\\test3.txt");
+        this.errors = new ArrayList<>();
+        this.readFile = new ReadFile(absolutePath + "\\src\\Codes\\test4.txt");
         symbleTable = new SymbleTable();
+        errorsCount = 0;
     }
 
     public TOKEN GetToken() throws IOException {
         TOKEN token = null;
+
+        //Ignorar espacos em branco e comentarios
         for (;; Readch()) {
             if (character == ' ' || character == '\t' || character == '\r' || character == '\b') {
                 continue;
             } else if (character == '\n') {
                 Line++; //conta linhas
             } else if (character == '%') {
+                //Comeco de comentario
                 while (Readch()) {
                     if (character == '\n') {
                         Line++; //conta linhas
                     }
                     if (character == '%') {
+                        //Fim de comentario
                         break;
                     }
                 }
                 if (character != '%') {
-                    HandleComentError("Miss '%'");
+                    //Comecou o comentario , chegou no fim de arquivo e nao fechou
+                    HandleComentError("Miss '%' to close comment");
                     break;
                 }
             } else {
@@ -48,7 +58,7 @@ public class LexicalAnalyser {
 
         token = Operators(character);
         if (token != null) {
-            if (token.getName() == "GT" || token.getName() == "LT") {
+            if ("GREATER_THAN".equals(token.getName()) || "LESS_THAN".equals(token.getName())) {
                 return token;
             }
             Readch();
@@ -74,7 +84,10 @@ public class LexicalAnalyser {
                     char s = character;
                     if (Readch()) {
                         if (character == '\'') {
+                            Readch();
                             token = new TOKEN("CHAR_CONST", Character.toString(s));
+                        } else {
+                            HandleError("Missing ' or invalid size to char constant, invalid character:" + character);
                         }
                     }
                 }
@@ -87,10 +100,16 @@ public class LexicalAnalyser {
             token = ScanLiteral();
             if (token != null) {
                 return token;
+            } else {
+                HandleError("Missing \" to close Literal");
+                return GetToken();
             }
         }
+        //Character nao identificado
         if (CharIsASCII(character, false)) {
-            HandleError(Character.toString(character));
+            if (!IsBlanckCharacter(character)) {
+                HandleError("Invalid character: " + Character.toString(character));
+            }
             Readch();
             return GetToken();
         }
@@ -104,34 +123,36 @@ public class LexicalAnalyser {
     }
 
     private TOKEN ScanIdentifier() throws IOException {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         do {
             sb.append(character);
             Readch();
         } while (Character.isLetterOrDigit(character));
 
-        String s = sb.toString();
-        String reservedSymbol = symbleTable.IsReservedSymbol(s);
+        String string = sb.toString();
+        String reservedSymbol = symbleTable.IsReservedSymbol(string);
         if (reservedSymbol != null) {
             TOKEN token = new TOKEN(reservedSymbol);
             return token;
         }
-        String entryTable = symbleTable.SetToken(s);
+        String entryTable = Integer.toString(symbleTable.SetToken(string));
         TOKEN token = new TOKEN("ID", entryTable);
         return token;
 
     }
-    public void printSymbleTable(){
+
+    public void printSymbleTable() {
         symbleTable.PrintHT();
     }
+
     private TOKEN ScanLiteral() throws IOException {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (Readch(); CharIsASCII(character, true); Readch()) {
             sb.append(character);
         }
         if (character == '\"') {
-            String s = sb.toString();
-            TOKEN token = new TOKEN("LITERAL", s);
+            String string = sb.toString();
+            TOKEN token = new TOKEN("LITERAL", string);
             Readch();
             return token;
         }
@@ -139,7 +160,8 @@ public class LexicalAnalyser {
     }
 
     private TOKEN ScanNumber() throws IOException {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
+        TOKEN token = null;
         String name = "INTEGER_CONST";
         do {
             sb.append(character);
@@ -153,15 +175,19 @@ public class LexicalAnalyser {
                 Readch();
             } while (Character.isDigit(character));
             if (floatRange == 0) {
-                HandleError(sb.toString());
+                HandleError("Missing digit after '.' in " + sb.toString());
                 return GetToken();
             }
             name = "FLOAT_CONST";
         }
-        String s = sb.toString();
-        TOKEN token = new TOKEN(name, s);
+        if (ValidCharacterAfterNumber()) {
+            String string = sb.toString();
+            token = new TOKEN(name, string);
+        } else {
+            HandleError("Invalid character after number constant : " + character);
+            return GetToken();
+        }
         return token;
-
     }
 
     private TOKEN Operators(char ch) throws IOException {
@@ -193,6 +219,8 @@ public class LexicalAnalyser {
                 if (Readch()) {
                     if (character == '=') {
                         token = new TOKEN("ASSIGN");
+                    } else {
+                        HandleError("Miss '=' after ':'");
                     }
                 }
                 break;
@@ -203,29 +231,28 @@ public class LexicalAnalyser {
                 token = new TOKEN("CLOSE_PARENTHESES");
                 break;
             case ',':
-                token = new TOKEN("comma");
+                token = new TOKEN("COMMA");
                 break;
             case '>':
                 if (Readch()) {
                     if (character == '=') {
-                        token = new TOKEN("GTE");
+                        token = new TOKEN("GREATER_THAN_EQUAL");
                     } else {
-                        token = new TOKEN("GT");
+                        token = new TOKEN("GREATER_THAN");
                     }
                 }
                 break;
-
             case '<':
                 if (Readch()) {
                     switch (character) {
                         case '=':
-                            token = new TOKEN("LTE");
+                            token = new TOKEN("LESS_THAN_EQUAL");
                             break;
                         case '>':
-                            token = new TOKEN("NE");
+                            token = new TOKEN("NOT_EQUAL");
                             break;
                         default:
-                            token = new TOKEN("LT");
+                            token = new TOKEN("LESS_THAN");
                             break;
                     }
                 }
@@ -251,17 +278,49 @@ public class LexicalAnalyser {
     private void HandleError(String value) throws IOException {
         String ANSI_RED = "\u001B[31m";
         String ANSI_RESET = "\u001B[0m";
-        System.out.println(ANSI_RED + "Erro na linha: " + Line + " " + value + ANSI_RESET);
+        errors.add(ANSI_RED + "Erro na linha " + Line + ": " + value + ANSI_RESET);
+        errorsCount++;
         for (Readch();; Readch()) {
-            if (character == ' ' || character == '\t' || character == '\r' || character == '\b' || character == '\n') {
+            if (IsBlanckCharacter(character)) {
                 break;
             }
         }
     }
 
+    private boolean ValidCharacterAfterNumber() throws IOException {
+        for (;; Readch()) {
+            if (character == ' ' || character == '\t' || character == '\r' || character == '\b') {
+                continue;
+            } else {
+                break;
+            }
+        }
+        if (Character.isLetter(character)) {
+            return false;
+        }
+        return true;
+    }
+
     private void HandleComentError(String value) throws IOException {
         String ANSI_RED = "\u001B[31m";
         String ANSI_RESET = "\u001B[0m";
-        System.out.println(ANSI_RED + "Erro na linha: " + Line + " " + value + ANSI_RESET);
+        errorsCount++;
+        errors.add(ANSI_RED + "Erro na linha " + Line + ": " + value + ANSI_RESET);
+    }
+
+    public void ShowLogsOfLexicalAnalyser() {
+        if (errorsCount > 0) {
+            for (int i = 0; i < errors.size(); i++) {
+                System.out.println(errors.get(i));
+            }
+        } else {
+            String ANSI_GREEN = "\u001B[32m";
+            String ANSI_RESET = "\u001B[0m";
+            System.out.println(ANSI_GREEN + "BUILD SUCCESSFUL" + ANSI_RESET);
+        }
+    }
+
+    public boolean IsBlanckCharacter(char c) {
+        return c == ' ' || c == '\t' || c == '\r' || c == '\b' || c == '\n';
     }
 }

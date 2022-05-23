@@ -21,7 +21,7 @@ public class LexicalAnalyser {
 
     public LexicalAnalyser() throws FileNotFoundException {
         this.errors = new ArrayList<>();
-        this.readFile = new ReadFile(absolutePath + "\\src\\Codes\\test4.txt");
+        this.readFile = new ReadFile(absolutePath + "\\src\\Codes\\test2.txt");
         symbleTable = new SymbleTable();
         errorsCount = 0;
     }
@@ -180,13 +180,8 @@ public class LexicalAnalyser {
             }
             name = "FLOAT_CONST";
         }
-        if (ValidCharacterAfterNumber()) {
             String string = sb.toString();
             token = new TOKEN(name, string);
-        } else {
-            HandleError("Invalid character after number constant : " + character);
-            return GetToken();
-        }
         return token;
     }
 

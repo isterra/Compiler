@@ -11,17 +11,15 @@ public class LexicalAnalyser {
 
     private final int EOF = -1;
     private char character = ' ';
-    Path currentRelativePath = Paths.get("");
-    String absolutePath = currentRelativePath.toAbsolutePath().toString();
     private final ReadFile readFile;
     private int Line = 1;
     private final SymbleTable symbleTable;
     private final ArrayList<String> errors;
     private int errorsCount;
 
-    public LexicalAnalyser() throws FileNotFoundException {
+    public LexicalAnalyser(String path) throws FileNotFoundException {
         this.errors = new ArrayList<>();
-        this.readFile = new ReadFile(absolutePath + "\\src\\Codes\\test2.txt");
+        this.readFile = new ReadFile(path);
         symbleTable = new SymbleTable();
         errorsCount = 0;
     }

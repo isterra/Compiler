@@ -12,7 +12,7 @@ public class LexicalAnalyser {
     private final int EOF = -1;
     private char character = ' ';
     private final ReadFile readFile;
-    private int Line = 1;
+    public int Line = 1;
     private final SymbleTable symbleTable;
     private final ArrayList<String> errors;
     private int errorsCount;

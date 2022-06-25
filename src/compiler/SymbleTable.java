@@ -24,17 +24,16 @@ public class SymbleTable {
         symbleTable.put(6, "char");
         symbleTable.put(7, "if");
         symbleTable.put(8, "then");
-        symbleTable.put(9, "end");
-        symbleTable.put(10, "else");
-        symbleTable.put(11, "repeat");
-        symbleTable.put(12, "until");
-        symbleTable.put(13, "while");
-        symbleTable.put(14, "do");
-        symbleTable.put(15, "read");
-        symbleTable.put(16, "write");
-        symbleTable.put(17, "not");
-        symbleTable.put(18, "or");
-        symbleTable.put(19, "and");
+        symbleTable.put(9, "else");
+        symbleTable.put(10, "repeat");
+        symbleTable.put(11, "until");
+        symbleTable.put(12, "while");
+        symbleTable.put(13, "do");
+        symbleTable.put(14, "read");
+        symbleTable.put(15, "write");
+        symbleTable.put(16, "not");
+        symbleTable.put(17, "or");
+        symbleTable.put(18, "and");
     }
 
     public int SetToken(String lexeme) {

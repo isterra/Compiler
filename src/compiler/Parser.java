@@ -83,7 +83,6 @@ public class Parser {
             //program->routine body
             case ROUTINE:
                 Eat(ROUTINE);Body();
-                System.out.println("Fim de arquivo");
                 break;
             default: 
                 System.out.println("linha "+lexicalAnalyser.Line+": Expected 'routine'");

@@ -20,9 +20,9 @@ public class Compiler {
         parser.Program();
         System.out.println("**** TOKENS ****");
         System.out.println();
-        /*while ((token = lexicalAnalyser.GetToken()) != null) {
-            System.out.println(token);
-        }*/
+        while ((token = lexicalAnalyser.GetToken()) != null) {
+            //System.out.println(token);
+        }
         System.out.println();
         lexicalAnalyser.printSymbleTable();
         System.out.println();

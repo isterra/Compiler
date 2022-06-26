@@ -4,7 +4,7 @@ declare
  int resul;
  float a,x;
 begin
- a : 12a;
+ a := 12a;
  x := 12;
  read (a);
  read (b);

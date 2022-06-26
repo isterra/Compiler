@@ -72,7 +72,7 @@ public class Parser {
             Advance();
         }
         else{
-            System.out.println("ERROR=Expected "+tokenName);
+            System.out.println("linha "+lexicalAnalyser.Line+": Expected "+tokenName);
             //System.out.println("Expected "+tokenName);
             //System.out.println("token="+this.token.getName());
         }
@@ -85,8 +85,9 @@ public class Parser {
                 Eat(ROUTINE);Body();
                 System.out.println("Fim de arquivo");
                 break;
-            default: System.out.println("Expected 'routine'");
-            System.out.println("linha="+lexicalAnalyser.Line);break;
+            default: 
+                System.out.println("linha "+lexicalAnalyser.Line+": Expected 'routine'");
+                break;
         }
     }
     void Body()throws IOException{
@@ -95,8 +96,9 @@ public class Parser {
             //body->[decl-list] begin stmt-list end
             case DECLARE:
                 DeclList();Eat(BEGIN);StmtList();Eat(END);break;
-            default: System.out.println("Expected 'declare'");
-            System.out.println("linha="+lexicalAnalyser.Line);
+            default: 
+                System.out.println("linha "+lexicalAnalyser.Line+": Expected 'declare'");
+                break;
         }
     }
     void DeclList()throws IOException{
@@ -105,8 +107,9 @@ public class Parser {
             //decl-list->declare decl ";" decl-listPrime
             case DECLARE:
                 Eat(DECLARE);Decl();Eat(SEMICOLON);DeclListPrime();break;
-            default: System.out.println("Expected 'declare'");
-            System.out.println("linha="+lexicalAnalyser.Line);
+            default: 
+                System.out.println("linha "+lexicalAnalyser.Line+": Expected 'declare'");
+                break;
         }
     }
     void DeclListPrime()throws IOException{
@@ -120,8 +123,9 @@ public class Parser {
             case FLOAT:
             case CHAR:
                Decl();Eat(SEMICOLON);DeclListPrime();break;
-            default: System.out.println("Expected int, float or char");
-            System.out.println("linha="+lexicalAnalyser.Line);
+            default: 
+                System.out.println("linha "+lexicalAnalyser.Line+": 'int','float' or 'char'");
+                break;
         }
         
     }
@@ -133,8 +137,9 @@ public class Parser {
             case FLOAT:
             case CHAR:
                Type();IdentList();break;
-            default: System.out.println("Expected int, float or char");
-            System.out.println("linha="+lexicalAnalyser.Line);
+            default: 
+                System.out.println("linha "+lexicalAnalyser.Line+": 'int','float' or 'char'");
+                break;
         }
 
     }
@@ -144,8 +149,9 @@ public class Parser {
             //ident-list ->identifier ident-listPrime
             case IDENTIFIER:
                Eat(IDENTIFIER);IdentListPrime();break;
-            default: System.out.println("Expected identifier");
-            System.out.println("linha="+lexicalAnalyser.Line);
+            default: 
+                System.out.println("linha "+lexicalAnalyser.Line+": Expected 'identifier'");
+                break;
         }
     }
     void IdentListPrime()throws IOException{
@@ -156,8 +162,9 @@ public class Parser {
             //ident-list'-> ,identifier ident-listPrime
             case COMMA:
                 Eat(COMMA);Eat(IDENTIFIER);IdentListPrime();break;
-            default: System.out.println("Expected comma");
-            System.out.println("linha="+lexicalAnalyser.Line);
+            default: 
+                System.out.println("linha "+lexicalAnalyser.Line+": Expected ','");
+                break;
         }
     }
     void Type()throws IOException{
@@ -171,8 +178,9 @@ public class Parser {
             //type-> char
             case CHAR:
                Eat(CHAR);break;
-            default: System.out.println("Expected int, float or char");
-            System.out.println("linha="+lexicalAnalyser.Line);
+            default: 
+                System.out.println("linha "+lexicalAnalyser.Line+": Expected 'int', 'float' or 'char'");
+                break;
         }
 
     }
@@ -187,8 +195,9 @@ public class Parser {
             case READ:
             case WRITE:
                 Stmt();break;
-            default: System.out.println("Expected identifier,if,while,repeat,read,write");
-            System.out.println("linha="+lexicalAnalyser.Line);
+            default: 
+                System.out.println("linha "+lexicalAnalyser.Line+": 'identifier','if','while','repeat','read' or 'write'");
+                break;
         }
     }
     void Stmt()throws IOException{
@@ -212,8 +221,9 @@ public class Parser {
             //stmt-> write-stmt
             case WRITE:
                 WriteStmt();StmtPrime();break;
-            default: System.out.println("Expected identifier,if,while,repeat,read,write");
-            System.out.println("linha="+lexicalAnalyser.Line);
+            default: 
+                System.out.println("linha "+lexicalAnalyser.Line+": 'identifier','if','while','repeat','read' or 'write'");
+                break;
         }
     }
     void StmtPrime()throws IOException{
@@ -226,8 +236,9 @@ public class Parser {
             //stmt-list'->; stmt stmt-listPrime
             case SEMICOLON:
                 Eat(SEMICOLON);Stmt();break;
-            default: System.out.println("Expected semicolon");
-            System.out.println("linha="+lexicalAnalyser.Line);
+            default: 
+                System.out.println("linha "+(lexicalAnalyser.Line-1)+": Expected ';'");
+                break;
         }
     }
     
@@ -237,8 +248,9 @@ public class Parser {
             //assingn-stmt->identifier ":=" simple_expr
             case IDENTIFIER:
                 Eat(IDENTIFIER);Eat(ASSING);SimpleExpr();break;
-            default: System.out.println("Expected identifier");
-            System.out.println("linha="+lexicalAnalyser.Line);
+            default: 
+                System.out.println("linha "+lexicalAnalyser.Line+": Expected 'identifier'");
+                break;
         }
     }
     void IfStmt()throws IOException{
@@ -247,8 +259,9 @@ public class Parser {
             //if-stmt->if condition then stmt-list if-stmtPrime
             case IF:
                 Eat(IF);Condition();Eat(THEN);StmtList();IfStmtPrime();break;
-            default: System.out.println("Expected if");
-            System.out.println("linha="+lexicalAnalyser.Line);
+            default: 
+                System.out.println("linha "+lexicalAnalyser.Line+": Expected 'if'");
+                break;
         }
 
     }
@@ -264,8 +277,9 @@ public class Parser {
             //if-stmt'->else stmt-list end | if-stmt'->lambda
             case ELSE:
                 Eat(ELSE);StmtList();Eat(END);break;
-            default: System.out.println("Expected end or else");
-            System.out.println("linha="+lexicalAnalyser.Line);
+            default: 
+                System.out.println("linha "+lexicalAnalyser.Line+": Expected 'end' or 'else'");
+                break;
         }
     }
     void Condition()throws IOException{ 
@@ -279,8 +293,9 @@ public class Parser {
             case CHAR_CONST:
             case SUB:
                 Expression();break;
-            default: System.out.println("Expected identifier,(,not,constant(integer,float,char) or -");
-            System.out.println("linha="+lexicalAnalyser.Line);
+            default: 
+                System.out.println("linha "+lexicalAnalyser.Line+": 'identifier','(','not','integer_const','float_const','char_const' or '-'");
+                break;
         }
     }
     void RepeatStmt()throws IOException{
@@ -288,8 +303,9 @@ public class Parser {
             //repeat-stmt->repeat stmt-list stmt-suffix
             case REPEAT:
                 Eat(REPEAT);StmtList();StmtSuffix();break;
-            default: System.out.println("Expected repeat");
-            System.out.println("linha="+lexicalAnalyser.Line);
+            default: 
+                System.out.println("linha "+lexicalAnalyser.Line+": Expected 'repeat'");
+                break;
         }
     }
     void StmtSuffix()throws IOException{
@@ -297,8 +313,9 @@ public class Parser {
             //stmt-suffix->until condition
             case UNTIL:
                 Eat(UNTIL);Condition();break;
-            default: System.out.println("Expected until");
-            System.out.println("linha="+lexicalAnalyser.Line);
+            default: 
+                System.out.println("linha "+lexicalAnalyser.Line+": Expected 'until'");
+                break;
         }
     }
     void WhileStmt()throws IOException{
@@ -306,8 +323,9 @@ public class Parser {
             //while-stmt->stmt-prefix stmt-list end
             case WHILE:
                 StmtPrefix();StmtList();Eat(END);break;
-            default: System.out.println("Expected while");
-            System.out.println("linha="+lexicalAnalyser.Line);
+            default:  
+                System.out.println("linha "+lexicalAnalyser.Line+": Expected 'While'");
+                break;
         }
     }
     void StmtPrefix()throws IOException{
@@ -315,8 +333,9 @@ public class Parser {
             //stmt-prefix->while condition do
             case WHILE:
                 Eat(WHILE);Condition();Eat(DO);break;
-            default: System.out.println("Expected while");
-            System.out.println("linha="+lexicalAnalyser.Line);
+            default: 
+                System.out.println("linha "+lexicalAnalyser.Line+": Expected 'while'");
+                break;
         }
     }
     void ReadStmt()throws IOException{
@@ -324,8 +343,9 @@ public class Parser {
             //read-stmt->read "(" identifier ")"
             case READ:
                 Eat(READ);Eat(OP_PARENTHESES);Eat(IDENTIFIER);Eat(CL_PARENTHESES);break;
-            default: System.out.println("Expected read");
-            System.out.println("linha="+lexicalAnalyser.Line);
+            default: 
+                 System.out.println("linha "+lexicalAnalyser.Line+": Expected 'read'");
+                 break;
         }   
     }
     void WriteStmt()throws IOException{
@@ -333,8 +353,9 @@ public class Parser {
             //write-stmt->write"("writable")"
             case WRITE:
                 Eat(WRITE);Eat(OP_PARENTHESES);Writable();Eat(CL_PARENTHESES);break;
-            default: System.out.println("Expected write");
-            System.out.println("linha="+lexicalAnalyser.Line);
+            default: 
+                 System.out.println("linha "+lexicalAnalyser.Line+": Expected 'write'");
+                break;
         }  
     }
     void Writable()throws IOException{        
@@ -351,8 +372,9 @@ public class Parser {
             //writable->literal
             case LITERAL:
                 Eat(LITERAL);break;
-            default: System.out.println("Expected identifier,(,not,constant(integer,float,char), - or literal");
-            System.out.println("linha="+lexicalAnalyser.Line);
+            default: 
+                System.out.println("linha "+lexicalAnalyser.Line+": 'identifier','(','not','integer_const','float_const','char_const','-' or 'literal'");
+                break;
         }  
     }
     void Expression()throws IOException{        
@@ -366,8 +388,9 @@ public class Parser {
             case NOT:
             case SUB:
                 SimpleExpr();ExpressionPrime();break;         
-            default: System.out.println("Expected identifier,(,not,constant(integer,float,char) or -");
-            System.out.println("linha="+lexicalAnalyser.Line);
+            default:  
+                System.out.println("linha "+lexicalAnalyser.Line+": 'identifier','(','not','integer_const','float_const','char_const' or '-'");
+                break;
         }  
     }
     void ExpressionPrime()throws IOException{
@@ -389,8 +412,9 @@ public class Parser {
             case GREATER_EQUAL:
             case LOWER_GREATER:
                 Relop();SimpleExpr();break;         
-            default: System.out.println("Expected =,> ,>= , < , <= or <>");
-            System.out.println("linha="+lexicalAnalyser.Line);
+            default:  
+                System.out.println("linha "+lexicalAnalyser.Line+": Expected '=','>' ,'>=' , '<' , '<=' or '<>'" );
+                break;
         }  
     }
     void SimpleExpr()throws IOException{        
@@ -404,8 +428,9 @@ public class Parser {
             case NOT:
             case SUB:
                 Term();SimpleExprPrime();break;         
-            default: System.out.println("Expected identifier,(,not,constant(integer,float,char) or -");
-            System.out.println("linha="+lexicalAnalyser.Line);
+            default:  
+                System.out.println("linha "+lexicalAnalyser.Line+": 'identifier','(','not','integer_const','float_const','char_const' or '-'");
+                break;
         }  
     }
     void SimpleExprPrime()throws IOException{    
@@ -430,8 +455,9 @@ public class Parser {
             case SUB:
             case ADD:
                 Addop();Term();SimpleExprPrime();break;         
-            default: System.out.println("Expected 'or',- or + ");
-            System.out.println("linha="+lexicalAnalyser.Line);
+            default:  
+                System.out.println("linha "+lexicalAnalyser.Line+": Expected 'or','-' or '+' " );
+                break;
         }  
     }
     void Term()throws IOException{
@@ -445,8 +471,9 @@ public class Parser {
             case NOT:
             case SUB:
                 FactorA();TermPrime();break;         
-            default: System.out.println("Expected identifier,(,not,constant(integer,float,char) or -");
-            System.out.println("linha="+lexicalAnalyser.Line);
+            default:  
+                System.out.println("linha "+lexicalAnalyser.Line+": 'identifier','(','not','integer_const','float_const','char_const' or '-'");
+                break;
         }  
     }
     void TermPrime()throws IOException{        
@@ -474,8 +501,9 @@ public class Parser {
             case MUL:
             case DIV:
                 Mulop();FactorA();TermPrime();break;         
-            default: System.out.println("Expected and,* or / ");
-            System.out.println("linha="+lexicalAnalyser.Line);
+            default:  
+                System.out.println("linha "+lexicalAnalyser.Line+": Expected 'and','*' or '/' ");
+                break;
             
         }  
         
@@ -495,8 +523,9 @@ public class Parser {
             //factor-a->- factor
             case SUB:
                  Eat(SUB);Factor();break;
-            default: System.out.println("Expected identifier,(,not,constant(integer,float,char) or -");
-            System.out.println("linha="+lexicalAnalyser.Line);
+            default:  
+                System.out.println("linha "+lexicalAnalyser.Line+": 'identifier','(','not','integer_const','float_const','char_const' or '-'");
+                break;
         }  
 
     }
@@ -513,8 +542,9 @@ public class Parser {
             case CHAR_CONST:
             case INTEGER_CONST:
                 Constant();break;
-            default: System.out.println("Expected identifier,( or constant(integer,float,char)");
-            System.out.println("linha="+lexicalAnalyser.Line);
+            default:  
+                System.out.println("linha "+lexicalAnalyser.Line+": 'identifier','(','integer_const','float_const' or 'char_const'");
+                break;
         }  
     }
     void Relop()throws IOException{
@@ -537,8 +567,9 @@ public class Parser {
             //relop->"<>"
             case LOWER_GREATER:
                 Eat(LOWER_GREATER);break;  
-            default: System.out.println("Expected =,> ,>= , < , <= or <>" );
-            System.out.println("linha="+lexicalAnalyser.Line);
+            default: 
+                System.out.println("linha "+lexicalAnalyser.Line+": Expected '=','>' ,'>=' , '<' , '<=' or '<>'" );
+                break;
         }  
     }
     void Addop()throws IOException{
@@ -552,8 +583,9 @@ public class Parser {
             //addop->-
             case SUB:
                 Eat(SUB);break;
-            default: System.out.println("Expected 'or',- or + " );
-            System.out.println("linha="+lexicalAnalyser.Line);    
+            default: 
+                System.out.println("linha "+lexicalAnalyser.Line+": Expected 'or','-' or '+' " );
+                break;  
         }  
     }
     void Mulop()throws IOException{
@@ -567,8 +599,9 @@ public class Parser {
             //mulop->/
             case DIV:
                 Eat(DIV);break;
-            default: System.out.println("Expected and,* or / ");
-            System.out.println("linha="+lexicalAnalyser.Line);
+            default:
+                System.out.println("linha "+lexicalAnalyser.Line+": Expected 'and','*' or '/' ");
+                break;
         } 
     }
     void Constant()throws IOException{
@@ -582,7 +615,7 @@ public class Parser {
             //constant->integer_const
             case INTEGER_CONST:
                 Eat(INTEGER_CONST);break;
-            default: System.out.println("Expected constant(integer,float,char)");
+            default: System.out.println("linha "+lexicalAnalyser.Line+": Expected 'integer_const','float_const' or 'char_const'");
             System.out.println("linha="+lexicalAnalyser.Line);
         }  
     }

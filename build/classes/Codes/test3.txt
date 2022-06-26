@@ -1,13 +1,12 @@
 routine
-declare
  int a, b, c;
  float d, var ;
 begin
  read (a);
  b := a * a;
  c := b + a/2 * (35/b); %aplica formula%
- write (c);
- val := 34.2+c;
- c := val + 2.5 + a;
+ write c;
+ val := 34.2c
+ c = val + 2.5 + a;
  write (val)
 end

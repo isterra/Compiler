@@ -1,33 +1,29 @@
-routine
 declare
- int a, b, c, maior;
+ integer a, b, c, maior;
  char outro;
- int k;
+ int k:=12;
 begin
  repeat
-	a:=0;
- 	write("A: ");
- 	read(a);
- 	write("B: ");
- 	read(b);
- 	write("C: ");
-	 read(c);
- 	if ((a>b) and (a>c) ) then 
- 		write("Candidato aprovado.");
-		 maior := a
+ write("A: ");
+ read(a);
+ write("B: ");
+ read(b);
+ write("C: ");
+ read(c);
+ if ((a>b) and (a>c) ) end
+ maior := a
  
-	 else 
- 		if (b>c) then
- 			maior := b
+ else 
+ if (b>c) then
+ maior := b;
  
- 		else 
- 			maior := c
- 		end
-	 end;
-	write("Maior valor:");
- 	write (maior);
- 	write ("Outro? (S/N)");
- 	read(outro);
- 	write("Candidato aprovado.")
- until ((outro = 'N') and (outro = 'n'))
+ else 
+ maior := c
+ end
+ end
+ write("Maior valor:");
+ write (maior);
+ write ("Outro? (S/N)");
+ read(outro);
+ until (outro = 'N' outro = 'n')
 end
